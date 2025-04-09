@@ -25,7 +25,7 @@ def load_data(path):
 
 
 def main():
-    data_path = "./data/political_news/political_news_20250409_1145.csv"
+    data_path = "./data/preprocessed/text_cleaned_20250409_2109.csv"
     df = load_data(data_path)
 
     df['text'] = df['title'].fillna('') + ' ' + df['description'].fillna('')
@@ -50,9 +50,7 @@ def main():
     print("임베딩 결과 shape:", embeddings.shape)
 
 
-    MODEL_NAME = "sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens"
     topic_model = BERTopic(embedding_model=embedding_model, calculate_probabilities=True)
-    # model = BERTopic(embedding_model= MODEL_NAME, vectorizer_model=vectorizer, nr_topics=50, top_n_words=10, calculate_probabilities=True)
     topics, probs = topic_model.fit_transform(documents)
 
 

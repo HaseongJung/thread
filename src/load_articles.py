@@ -5,6 +5,7 @@ import feedparser
 import json
 import pandas as pd
 from bs4 import BeautifulSoup
+import numpy as np
 
 def create_df():
     df = pd.DataFrame(columns=['title', 'description', 'published', 'link', 'media'])
@@ -34,25 +35,19 @@ def extract_article_date(article: dict, media: str) -> dict:
     try:
         title = article.title
     except:
-        title = None
+        title = np.nan
 
     try:
         desc = article.description
     except KeyError:
         desc = article.summary
     except:
-        desc = 'None'
+        desc = np.nan
     if desc == '':
         try:
             desc = article['content'][0]['value']
         except KeyError:
             pass
-    # cleaning the description
-    # try:
-    #     desc = ''.join(article['content'][0]['value'])
-    #     soup = BeautifulSoup(desc, 'html.parser')
-    #     paragraphs = soup.find_all('p')
-    #     desc = paragraphs[0].get_text()
 
     try:
         published = article.published
@@ -62,15 +57,15 @@ def extract_article_date(article: dict, media: str) -> dict:
     try:
         link = article.link
     except:
-        link = None
+        link = np.nan
 
     return {'title': title, 'description': desc, 'published': published, 'link': link, 'media': media}
 
 
 def save_df(df):
     datetime_ = datetime.now().strftime("%Y%m%d_%H%M")
-    file_path = "./data/political_news/"
-    file_name = f'political_news_{datetime_}.csv'
+    file_path = "./data/raw/"
+    file_name = f'{datetime_}.csv'
 
     df.to_csv(os.path.join(file_path, file_name), index=False, encoding='utf-8')
     print(f"{file_name} file saved successfully.")

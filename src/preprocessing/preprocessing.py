@@ -1,8 +1,10 @@
 import pandas as pd
 import re
 import requests
-import parmap
 from tqdm import tqdm;  tqdm.pandas()
+from tokenizer import tokenize
+
+
 
 def load_data(path):
     """
@@ -35,33 +37,40 @@ def load_stopwords():
     data = response.content.decode("utf-8") # 불용어 사전을 utf-8로 디코딩
     stopwords = data.split("\n")    # 불용어 사전을 줄바꿈을 기준으로 분리
     stopwords = [word for word in stopwords if word]    # 빈 문자열 제거
-    print(f'stopwords: {stopwords}')
 
     return stopwords
 
-def remove_stopwords(tokens, stopwords):
-    if type(tokens) == str:
+def remove_stopwords(tokens: list, stopwords):
+    if type(tokens) == list:
         return [token for token in tokens if (token not in stopwords) and (len(token) > 1)] # 한 글자 초과인 단어만 추출, 불용어 사전으로 제거
 
 
 def main():
     # laod data
-    data_path = "./data/political_news/political_news_20250409_1631.csv"
+    data_path = "./data/political_news/political_news_20250409_2109.csv"
     df = load_data(data_path)
 
     # remove noise
-    df['description'] = df['description'].progress_apply(remove_noise)
+    df['description'] = df['description'].progress_apply(lambda x: remove_noise(x))
+    
+    # tokenize
+    df['description'] = df['description'].progress_apply(lambda x: tokenize(x))
+
 
     # remove stopwords
     stopwords = load_stopwords()
     my_stopwords = ['뉴스데일리', '9650']
     stopwords.extend(my_stopwords)  # 추가 불용어
-    df["description"] = parmap.map(remove_stopwords, df["description"], stopwords, pm_pbar=True)
+    df["description"] = df["description"].progress_apply(lambda x: remove_stopwords(x, stopwords))
 
+    # join tokens
+    df["description"] = df["description"].progress_apply(lambda x: " ".join(x) if isinstance(x, list) else x)
 
     print(df)
+
     # save the cleaned data
-    df.to_csv("text_cleaned.csv", index=False, encoding='utf-8')
+    datetime_ = data_path.split('/')[-1][-17:]
+    df.to_csv(f"./data/preprocessed/text_cleaned_{datetime_}.csv", index=False, encoding='utf-8')
 
 if __name__ == "__main__":
     main()
