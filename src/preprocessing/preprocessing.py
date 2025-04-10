@@ -47,7 +47,7 @@ def remove_stopwords(tokens: list, stopwords):
 
 def main():
     # laod data
-    data_path = "./data/political_news/political_news_20250409_2109.csv"
+    data_path = "./data/preprocessed/20250409_2109.csv"
     df = load_data(data_path)
 
     # remove noise
@@ -59,7 +59,7 @@ def main():
 
     # remove stopwords
     stopwords = load_stopwords()
-    my_stopwords = ['뉴스데일리', '9650']
+    my_stopwords = ['뉴스데일리', '9650', '속보']
     stopwords.extend(my_stopwords)  # 추가 불용어
     df["description"] = df["description"].progress_apply(lambda x: remove_stopwords(x, stopwords))
 
