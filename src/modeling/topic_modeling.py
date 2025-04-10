@@ -56,9 +56,14 @@ def save_result(df, documents, topic_model, topics, probs, output_path: str):
 
     # Topic model result
     tp_result = topic_model.get_topic_info()
-    tp_result.to_csv(documents_path + "Result.csv", index=False, encoding='utf-8')
+    tp_result.to_csv(output_path + "Result.csv", index=False, encoding='utf-8')
 
+    # Topic model result: title, description, pulbished, link, media, Topic
+    # df.drop(columns=["desc_tokens", "text"], inplace=True)  # desc_tokens, text 열 삭제
     df['topic'] = topics    # topic 번호 추가
+
+
+    print("Saving topic model result...")
     # Topic별 뉴스기사 저장 -> .csv
     for i in range(len(tp_result)):
         topic_num = tp_result['Topic'][i]
@@ -66,7 +71,7 @@ def save_result(df, documents, topic_model, topics, probs, output_path: str):
 
         topic_name = '_'.join([word[0] for word in topic_model.get_topic(tp_result['Topic'][i])[:5]])
         mean_publish_date = topic_df['published'].mean().strftime('%Y%m%d_%H%M') # 평균 게시일
-        filename = f'Topic{(str(i-1).zfill(2))}_{mean_publish_date}_{topic_name}.csv'
+        filename = f'{mean_publish_date}_Topic{(str(i-1).zfill(2))}_{topic_name}.csv'
         # filename 숫자 두자리수로 정렬
 
         topic_df.to_csv(documents_path + filename, index=False, encoding='utf-8')

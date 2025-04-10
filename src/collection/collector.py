@@ -4,7 +4,6 @@ from alive_progress import alive_it
 import feedparser
 import json
 import pandas as pd
-from bs4 import BeautifulSoup
 import numpy as np
 
 def create_df():
@@ -54,8 +53,8 @@ def extract_article_date(article: dict, media: str) -> dict:
     except:
         published = article.updated
     published = pd.to_datetime(published) 
-    published = published.strftime("%Y%m%d_%H%M")
-    published = datetime.strptime(published, "%Y%m%d_%H%M")
+    published = published.strftime("%Y%m%d-%H%M")
+    published = datetime.strptime(published, "%Y%m%d-%H%M")
 
     try:
         link = article.link

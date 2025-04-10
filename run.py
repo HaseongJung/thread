@@ -8,30 +8,32 @@ tqdm.pandas()
 def main():
     # collect articles
     df = collect_articles()
-    print(df)
 
     # remove noise
-    print("Removing noise from description...")
+    print("Removing noise...")
+    df['title'] = df['title'].progress_apply(lambda x: cleaner.remove_noise(x))
     df['description'] = df['description'].progress_apply(lambda x: cleaner.remove_noise(x))
 
     # tokenize
-    print("Tokenizing description...")
+    print("Tokenizing...")
+    df['title_tokens'] = df['title'].progress_apply(lambda x: tokenizer.tokenize(x))
     df['desc_tokens'] = df['description'].progress_apply(lambda x: tokenizer.tokenize(x))
 
     # remove stopwords
-    print("Removing stopwords from description...")
-    custom_stopwords = ['뉴스데일리', '속보', '9632', '진짜']
+    print("Removing stopwords...")
+    custom_stopwords = ['뉴스데일리', '속보', '9632', '진짜', '여담', '야담', '9650', 'SBS', 'lt', '편상욱', '뉴스', '브리핑', 'gt', '여담야담', '단독', '방송', 'JTBC', '영상']
+    df['title_tokens'] = df['title_tokens'].progress_apply(lambda x: token_processor.process_tokens(x, custom_stopwords))
     df['desc_tokens'] = df['desc_tokens'].progress_apply(lambda x: token_processor.process_tokens(x, custom_stopwords))
 
-    # join tokens
-    print("Joining tokens in description...")
-    df["description"] = df["description"].progress_apply(lambda x: " ".join(x) if isinstance(x, list) else x)
+    # Join tokens
+    print("Joining tokens...")
+    df['title_tokens'] = df["title_tokens"].progress_apply(lambda x: " ".join(x) if isinstance(x, list) else x)
+    df['desc_tokens'] = df["desc_tokens"].progress_apply(lambda x: " ".join(x) if isinstance(x, list) else x)
 
     # Documnet: Combine title and description
-    df['text'] = df['title'].fillna('') + ' ' + df['description'].fillna('')
+    df['text'] = df['title_tokens'].fillna('') + ' ' + df['desc_tokens'].fillna('')
     documents = df['text'].tolist()
     print("Documents shape:", len(documents))
-
 
     # Embedding
     print("Loading embedding model...")
@@ -48,5 +50,12 @@ def main():
 
 
 
+
+
+
 if __name__ == "__main__":
     main()
+
+
+
+

@@ -27,7 +27,8 @@ def remove_stopwords(tokens: List[str], stopwords: List[str]) -> List[str]:
         list: 불용어가 제거된 토큰 리스트
     """
     if type(tokens) == list:
-        return [token for token in tokens if (token not in stopwords) and (len(token) > 1)]
+        cleaned_tokens = [token for token in tokens if (token not in stopwords) and (len(token) > 1)]
+        return cleaned_tokens
 
 
 def process_tokens(tokens: List[str], custom_stopwords: List[str] = None) -> List[str]:
