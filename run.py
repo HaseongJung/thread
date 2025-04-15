@@ -1,7 +1,8 @@
+from tqdm import tqdm
 from src.collection.collector import collect_articles
 from src.preprocessing import cleaner, tokenizer, token_processor, vectorizer
 from src.modeling.topic_modeling import topic_modeling, mk_output_path, save_result
-from tqdm import tqdm
+from src.util.email_sender import send_topic_results
 tqdm.pandas()
 
 
@@ -46,6 +47,9 @@ def main():
     # Save result
     output_path = mk_output_path()
     save_result(df, documents, topic_model, topics, probs, output_path)
+
+    # 결과를 이메일로 전송
+    send_topic_results(output_path)
 
 
 
