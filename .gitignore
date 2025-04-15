@@ -3,3 +3,5 @@ data
 output
 logs
 work.sh
+*.pyc
+**/__pycache__/
