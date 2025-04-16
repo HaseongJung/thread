@@ -71,38 +71,40 @@ def save_result(df, documents, topic_model, topics, probs, output_path: str):
 
         topic_name = '_'.join([word[0] for word in topic_model.get_topic(tp_result['Topic'][i])[:5]])
         mean_publish_date = topic_df['published'].mean().strftime('%Y%m%d_%H%M') # 평균 게시일
-        filename = f'{mean_publish_date}_Topic{(str(i-1).zfill(2))}_{topic_name}.csv'
-        # filename 숫자 두자리수로 정렬
+        filename = f'Topic{(str(i-1).zfill(2))}_{mean_publish_date}_{topic_name}.csv'
 
         topic_df.to_csv(documents_path + filename, index=False, encoding='utf-8')
 
-    # Intertopic Distance Map (Bubble chart) 
-    fig = topic_model.visualize_topics()
-    fig.write_image(chart_path + "Intertopic_Distance_Map.png")
+    if topic_model.get_topic_info().shape[0] > 1:  # 토픽이 1개 이상일 때만 시각화
+        # Intertopic Distance Map (Bubble chart) 
+        fig = topic_model.visualize_topics()
+        fig.write_image(chart_path + "Intertopic_Distance_Map.png")
 
-    # Topic Probability Distribution: Bar chart
-    fig = topic_model.visualize_distribution(probs[300], min_probability=0.015)
-    fig.write_image(chart_path + "Topic_Probability_Distribution.png")
+        # Topic Probability Distribution: Bar chart
+        fig = topic_model.visualize_distribution(probs[300], min_probability=0.015)
+        fig.write_image(chart_path + "Topic_Probability_Distribution.png")
 
-    # Topic Hierarchy: Dendrogram
-    fig = topic_model.visualize_hierarchy()
-    fig.write_image(chart_path + "Topic_Hierarchy.png")
+        # Topic Hierarchy: Dendrogram
+        fig = topic_model.visualize_hierarchy()
+        fig.write_image(chart_path + "Topic_Hierarchy.png")
 
-    # Topic Word Scores: Bar chart
-    fig = topic_model.visualize_barchart(top_n_topics=10, n_words=10)
-    fig.write_image(chart_path + "Topic_Word_Scores.png")
+        # Topic Word Scores: Bar chart
+        fig = topic_model.visualize_barchart(top_n_topics=10, n_words=10)
+        fig.write_image(chart_path + "Topic_Word_Scores.png")
 
-    # Topic Similarity: Heatmap
-    fig = topic_model.visualize_heatmap()
-    fig.write_image(chart_path + "Topic_Similarity.png")
+        # Topic Similarity: Heatmap
+        fig = topic_model.visualize_heatmap()
+        fig.write_image(chart_path + "Topic_Similarity.png")
 
-    # Document Distribution: Scatter plot
-    fig = topic_model.visualize_documents(docs=documents, topics=topics)
-    fig.write_image(chart_path + "Document_Distribution.png")
-    
-    # 우측 정렬된 출력}} -> {path}")
-    print(f"Documents saved to {documents_path}")
-    print(f"Charts saved to {chart_path}")
+        # Document Distribution: Scatter plot
+        fig = topic_model.visualize_documents(docs=documents, topics=topics)
+        fig.write_image(chart_path + "Document_Distribution.png")
+        
+        # 우측 정렬된 출력}} -> {path}")
+        print(f"Documents saved to {documents_path}")
+        print(f"Charts saved to {chart_path}")
+    else:
+        print("❗️토픽이 생성되지 않아 시각화가 불가능합니다.")
 
 
 def topic_modeling(documents, embedding_model):
@@ -117,7 +119,13 @@ def topic_modeling(documents, embedding_model):
         tuple: topics and probabilities
     """
     # Topic modeling
-    topic_model = BERTopic(embedding_model=embedding_model, calculate_probabilities=True)
+    topic_model = BERTopic(embedding_model=embedding_model,
+                           language="multilingual",
+                           calculate_probabilities=True,
+                           min_topic_size=7,
+                           nr_topics="auto",
+                           verbose=True,    # 처리과정 출력
+                        )  
     topics, probs = topic_model.fit_transform(documents)
     
     return topic_model, topics, probs
