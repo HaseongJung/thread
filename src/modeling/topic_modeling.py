@@ -57,13 +57,14 @@ def save_result(df, documents, topic_model, topics, probs, output_path: str):
     # Topic model result
     tp_result = topic_model.get_topic_info()
     tp_result.to_csv(output_path + "Result.csv", index=False, encoding='utf-8')
-    tp_result.drop(columns=["title_tokens", "desc_tokens", "text"], inplace=True)  # 
 
     # Topic model result: title, description, pulbished, link, media, Topic
     # df.drop(columns=["desc_tokens", "text"], inplace=True)  # desc_tokens, text 열 삭제
     df['topic'] = topics    # topic 번호 추가
+    df.drop(columns=["title_tokens", "desc_tokens", "text"], inplace=True)  # title_tokens, desc_tokens, text 열 삭제
 
 
+    
     print("Saving topic model result...")
     # Topic별 뉴스기사 저장 -> .csv
     for i in range(len(tp_result)):

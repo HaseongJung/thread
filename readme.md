@@ -4,7 +4,7 @@
 $ pip install -r requirements.txt
 ```
 
-### Get News -> Topic modeling
+### Pipeline: Get News data(by RSS) -> Preprocessing -> Topic modeling
 ```bash
 $ python run.py
 ```
