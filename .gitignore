@@ -5,3 +5,4 @@ logs
 work.sh
 *.pyc
 **/__pycache__/
+nohup.out

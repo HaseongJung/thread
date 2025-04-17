@@ -49,7 +49,7 @@ def main():
     save_result(df, documents, topic_model, topics, probs, output_path)
 
     # 결과를 이메일로 전송
-    send_topic_results(output_path)
+    # send_topic_results(output_path)
 
 
 
