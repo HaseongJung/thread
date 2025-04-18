@@ -1,8 +1,13 @@
 from tqdm import tqdm
 from src.collection.collector import collect_articles
 from src.preprocessing import cleaner, tokenizer, token_processor, vectorizer
-from src.modeling.topic_modeling import topic_modeling, mk_output_path, save_result
+from src.modeling.topic_modeling import topic_modeling, save_result
+from src.util.path_manager import make_output_path
 from src.util.email_sender import send_topic_results
+from src.summarize.post_maker import PostMaker
+import glob
+from alive_progress import alive_it
+
 tqdm.pandas()
 
 
@@ -45,15 +50,25 @@ def main():
     topic_model, topics, probs = topic_modeling(documents, embedding_model)
 
     # Save result
-    output_path = mk_output_path()
+    output_path = make_output_path()
     save_result(df, documents, topic_model, topics, probs, output_path)
 
     # 결과를 이메일로 전송
     # send_topic_results(output_path)
 
+    # Generate thread Posts
+    documents_dir = f"{output_path}Documents/"
+    documents_paths = sorted(glob.glob(f"{documents_dir}*.csv"))[1:]
 
-
-
+    post_maker = PostMaker(model_name="gemma-3-12b-it")
+    
+    bar = alive_it(documents_paths, title="Generating posts")
+    for document_path in bar:
+        # Generate post
+        post = post_maker.generate_post(document_path)
+        # Save post
+        post_file_path = f"{output_path}Posts/{document_path.split('/')[-1].replace('.csv', '.txt')}"
+        post_maker.save_post(post, post_file_path)
 
 
 

@@ -12,9 +12,10 @@ def load_embedding_model(model_name: str):
         SentenceTransformer: 로드된 모델
     """
     embedding_model = SentenceTransformer(  # load embedding model
-    "jinaai/jina-embeddings-v3",
+    model_name,
     trust_remote_code=True, 
-    device="cuda"
+    device="cuda",
+    cache_folder="./cache",  # cache folder
     )
 
     return embedding_model

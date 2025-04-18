@@ -88,7 +88,6 @@ def collect_articles(data_path="./data/political_rss.json", save_path="./data/ra
 
     # RSS별로 뉴스 기사 가져오기
     bar = alive_it(data, finalize=bar_ending, force_tty=True)
-    bar.title = "test"
     for rss in bar:
         media = rss['media']
         url = rss['url']

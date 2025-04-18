@@ -7,3 +7,5 @@ work.sh
 **/__pycache__/
 nohup.out
 test
+cache
+config

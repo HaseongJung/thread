@@ -1,9 +1,6 @@
 import os
 import pandas as pd
-from sentence_transformers import SentenceTransformer
 from bertopic import BERTopic
-from pathlib import Path
-from datetime import datetime
 
 def load_data(path):
     """
@@ -22,17 +19,6 @@ def load_data(path):
 
 
 
-def mk_output_path():
-    '''
-    Create output directory for topic modeling results.
-    The directory is named with the current date and time.
-    '''
-    
-    datetime_ = datetime.now().strftime("%Y%m%d_%H%M")
-    output_path = f"./output/topic_modeling/{datetime_}/"
-    os.makedirs(output_path, exist_ok=True)
-    
-    return output_path
 
 
 
@@ -45,18 +31,16 @@ def save_result(df, documents, topic_model, topics, probs, output_path: str):
         probs (list): The probabilities of the topics.
         output_path (str): The path to save the results.
     """
-
-    datetime_ = datetime.now().strftime("%Y%m%d_%H%M")  # 현재 날짜와 시간
-
-    output_path = f"./output/topic_modeling/{datetime_}/"   # 결과 저장 경로
     chart_path = f"{output_path}Chart/"  # 차트 저장 경로
     documents_path = f"{output_path}Documents/"  # 문서 저장 경로
+    posts_path = f"{output_path}Posts/"  # 게시물 저장 경로
     os.makedirs(chart_path, exist_ok=True)
     os.makedirs(documents_path, exist_ok=True)
+    os.makedirs(posts_path, exist_ok=True)
 
     # Topic model result
     tp_result = topic_model.get_topic_info()
-    tp_result.to_csv(output_path + "Result.csv", index=False, encoding='utf-8')
+    tp_result.to_csv(documents_path + "Result.csv", index=False, encoding='utf-8')
 
     # Topic model result: title, description, pulbished, link, media, Topic
     # df.drop(columns=["desc_tokens", "text"], inplace=True)  # desc_tokens, text 열 삭제
