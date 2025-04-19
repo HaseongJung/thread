@@ -27,7 +27,7 @@ class PromptManager:
             axis=1
         )
         # 모든 문자열을 하나로 결합
-        meta_data = ''.join(formatted_articles)
+        meta_data = '\n'.join(formatted_articles.tolist())
         return meta_data
 
     def create_prompt(self, meta_data: str) -> str:

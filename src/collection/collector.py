@@ -4,11 +4,20 @@ from alive_progress import alive_it
 import feedparser
 import json
 import pandas as pd
+import polars as pl
 import numpy as np
 
 def create_df():
-    df = pd.DataFrame(columns=['title', 'description', 'published', 'link', 'media'])
-    return df
+    schema = {
+        'title': pl.Utf8,
+        'description': pl.Utf8,
+        'published': pl.Datetime,
+        'link': pl.Utf8,
+        'media': pl.Utf8
+    }
+    return pl.DataFrame(schema=schema)
+    # df = pl.DataFrame(schema=['title', 'description', 'published', 'link', 'media'])
+    # return df
 
 
 def bar_ending(bar):
@@ -34,14 +43,14 @@ def extract_article_date(article: dict, media: str) -> dict:
     try:
         title = article.title
     except:
-        title = np.nan
+        title = None
 
     try:
         desc = article.description
     except KeyError:
         desc = article.summary
     except:
-        desc = np.nan
+        desc = None
     if desc == '':
         try:
             desc = article['content'][0]['value']
@@ -59,7 +68,7 @@ def extract_article_date(article: dict, media: str) -> dict:
     try:
         link = article.link
     except:
-        link = np.nan
+        link = None
 
     return {'title': title, 'description': desc, 'published': published, 'link': link, 'media': media}
 
@@ -75,7 +84,7 @@ def save_df(df, save_path):
     datetime_ = datetime.now().strftime("%Y%m%d_%H%M")
     file_name = f'{datetime_}.csv'
 
-    df.to_csv(os.path.join(save_path, file_name), index=False, encoding='utf-8')
+    df.write_csv(os.path.join(save_path, file_name))
     print(f"{file_name} file saved successfully.")
 
 
@@ -99,7 +108,7 @@ def collect_articles(data_path="./data/political_rss.json", save_path="./data/ra
             article_data = extract_article_date(article, media)
 
             # 새로운 행(뉴스 기사) 추가
-            df = pd.concat([df, pd.DataFrame([article_data])], ignore_index=True)
+            df = pl.concat([df, pl.DataFrame([article_data])])
 
     print(f"{len(df)} articles collected from {len(data)} RSS feeds.")
     save_df(df, save_path)

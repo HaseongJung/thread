@@ -1,6 +1,8 @@
 import requests
 from typing import List
 
+
+
 def load_stopwords() -> List[str]:
     """
     불용어 사전을 로드합니다.
@@ -16,7 +18,24 @@ def load_stopwords() -> List[str]:
     return stopwords
 
 
-def remove_stopwords(tokens: List[str], stopwords: List[str]) -> List[str]:
+def load_custom_stopwords(file_path: str) -> List[str]:
+    """
+    사용자 정의 불용어 사전을 로드합니다.
+
+    Args:
+        file_path (str): 사용자 정의 불용어 파일 경로
+    Returns:
+        list: 사용자 정의 불용어 리스트
+    """
+    with open(file_path, 'r', encoding='utf-8') as file:
+        custom_stopwords = file.read().splitlines()
+    custom_stopwords = [word for word in custom_stopwords if word]
+    return custom_stopwords
+
+
+
+
+def remove_stopwords(tokens):
     """
     토큰에서 불용어를 제거합니다.
 
@@ -26,9 +45,12 @@ def remove_stopwords(tokens: List[str], stopwords: List[str]) -> List[str]:
     Returns:
         list: 불용어가 제거된 토큰 리스트
     """
-    if type(tokens) == list:
-        cleaned_tokens = [token for token in tokens if (token not in stopwords) and (len(token) > 1)]
-        return cleaned_tokens
+    stopwords = load_stopwords()
+    custom_stopwords = load_custom_stopwords('./config/stopwords/stopwods.txt')
+    stopwords.extend(custom_stopwords)
+
+    cleaned_tokens = [token for token in tokens if (token not in stopwords) and (len(token) > 1)]
+    return cleaned_tokens
 
 
 def process_tokens(tokens: List[str], custom_stopwords: List[str] = None) -> List[str]:

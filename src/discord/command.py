@@ -15,7 +15,7 @@ def get_latest_result_dir():
     """
     Get the latest result directory based on the naming convention.
     """
-    output_dir = "./output/topic_modeling/"
+    output_dir = "./output/"
     # Sort directories by date and time
     latest_dir = sorted(os.listdir(output_dir))[-1]
     return os.path.join(output_dir, latest_dir)
@@ -64,10 +64,10 @@ class Command(commands.Cog):
         Get the latest result of topic modeling
         '''
         # Load the latest result directory
-        output_dir = "./output/topic_modeling/"
+        output_dir = "./output/"
         last_result_dir = sorted(os.listdir(output_dir))[-1]
-
         await ctx.send(f"날짜: {last_result_dir.split('_')[0]}, 시간: {last_result_dir.split('_')[1]}")
+
 
         # Send the Chart images
         distribution_chart = os.path.join(output_dir, last_result_dir, "Chart", "Document_Distribution.png")
@@ -82,6 +82,26 @@ class Command(commands.Cog):
             await ctx.send(name)    # send file name
             await ctx.send(file=discord.File(document_path))    # send file
 
+
+    @commands.command(name='get_posts')
+    async def get_posts(self, ctx: discord.ext.commands.Context):
+        '''
+        Get the latest result of generated posts
+        '''
+        # Load the latest result directory
+        output_dir = "./output/"
+        last_result_dir = sorted(os.listdir(output_dir))[-1]
+        
+        # Send the latest result directory
+        await ctx.send(f"날짜: {last_result_dir.split('_')[0]}, 시간: {last_result_dir.split('_')[1]}")
+
+        # Send the generated posts
+        generated_posts = sorted(os.listdir(os.path.join(output_dir, last_result_dir, "Posts")))
+        await ctx.send(f"생성된 포스트 수: {len(generated_posts)}")
+        for i, name in enumerate(generated_posts):
+            post_path = os.path.join(output_dir, last_result_dir, "Posts", name)
+            await ctx.send(name)
+            await ctx.send(file=discord.File(post_path))
 
         
 

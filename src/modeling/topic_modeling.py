@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import polars as pl
 from bertopic import BERTopic
 
 def load_data(path):
@@ -12,7 +13,7 @@ def load_data(path):
     Returns:
         pd.DataFrame: 로드된 데이터프레임
     """
-    df = pd.read_csv(path, encoding='utf-8')
+    df = pl.read_csv(path)
     print(f"Data loaded successfully. Shape: {df.shape}")
     
     return df
@@ -44,8 +45,10 @@ def save_result(df, documents, topic_model, topics, probs, output_path: str):
 
     # Topic model result: title, description, pulbished, link, media, Topic
     # df.drop(columns=["desc_tokens", "text"], inplace=True)  # desc_tokens, text 열 삭제
-    df['topic'] = topics    # topic 번호 추가
-    df.drop(columns=["title_tokens", "desc_tokens", "text"], inplace=True)  # title_tokens, desc_tokens, text 열 삭제
+    df = df.with_columns(
+        topic = pl.Series(topics)  # Topic 열 추가
+    )
+    df = df.drop(["title_tokens", "desc_tokens", "text"])  # title_tokens, desc_tokens, text 열 삭제
 
 
     
@@ -53,13 +56,13 @@ def save_result(df, documents, topic_model, topics, probs, output_path: str):
     # Topic별 뉴스기사 저장 -> .csv
     for i in range(len(tp_result)):
         topic_num = tp_result['Topic'][i]
-        topic_df = df[df['topic'] == topic_num]
+        topic_df = df.filter(pl.col('topic') == topic_num)
 
         topic_name = '_'.join([word[0] for word in topic_model.get_topic(tp_result['Topic'][i])[:5]])
         mean_publish_date = topic_df['published'].mean().strftime('%Y%m%d_%H%M') # 평균 게시일
         filename = f'Topic{(str(i-1).zfill(2))}_{mean_publish_date}_{topic_name}.csv'
 
-        topic_df.to_csv(documents_path + filename, index=False, encoding='utf-8')
+        topic_df.write_csv(documents_path + filename)
 
     if topic_model.get_topic_info().shape[0] > 1:  # 토픽이 1개 이상일 때만 시각화
         # Intertopic Distance Map (Bubble chart) 
