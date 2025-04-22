@@ -27,8 +27,8 @@ def main():
     # tokenize
     print("Tokenizing...")
     df = df.with_columns(
-        title_tokens = pl.col('title').map_elements(tokenizer.tokenize, return_dtype=pl.List(pl.Utf8)),
-        desc_tokens = pl.col('description').map_elements(tokenizer.tokenize, return_dtype=pl.List(pl.Utf8))
+        title_tokens = pl.col('title').map_elements(tokenizer.tokenize, skip_nulls=True, return_dtype=pl.List(pl.Utf8)),
+        desc_tokens = pl.col('description').map_elements(tokenizer.tokenize, skip_nulls=True, return_dtype=pl.List(pl.Utf8))
     )
     # df['title_tokens'] = df['title'].apply(lambda x: tokenizer.tokenize(x))
     # df['desc_tokens'] = df['description'].apply(lambda x: tokenizer.tokenize(x))

@@ -26,7 +26,7 @@ def tokenize(text: str) -> list:
     if isinstance(text, str) and text.strip():  # 문자열인지 확인하고 비어 있지 않은지 확인
         result = tokenizer.tokenize(text).segments()
         return result
-    return np.nan  # text가 유효하지 않으면 np.nan 반환
+    return None  # text가 유효하지 않으면 np.nan 반환
 
 
 
