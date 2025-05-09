@@ -76,11 +76,11 @@ class Command(commands.Cog):
         await ctx.send(file=discord.File(probability_chart))
 
         # Send the CSV files
-        documents = sorted(os.listdir(os.path.join(output_dir, last_result_dir, "Documents")))
-        for i, name in enumerate(documents):
-            document_path = os.path.join(output_dir, last_result_dir, "Documents", name)
-            await ctx.send(name)    # send file name
-            await ctx.send(file=discord.File(document_path))    # send file
+        # documents = sorted(os.listdir(os.path.join(output_dir, last_result_dir, "Documents")))
+        # for i, name in enumerate(documents):
+        #     document_path = os.path.join(output_dir, last_result_dir, "Documents", name)
+        #     await ctx.send(name)    # send file name
+        #     await ctx.send(file=discord.File(document_path))    # send file
 
 
     @commands.command(name='get_posts')
